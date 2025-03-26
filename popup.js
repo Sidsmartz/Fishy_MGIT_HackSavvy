@@ -31,7 +31,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ✅ Show upload section
+  // ✅ Handle file upload for deepfake detection
+  function handleFileUpload(file) {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch(`${API_URL}/upload-video`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        alert(
+          `Result: ${
+            data.deepfake_detected ? "Fake" : "Not Fake"
+          } | Confidence: ${data.confidence}%`
+        );
+      })
+      .catch((error) => {
+        console.error("Error uploading video:", error);
+        alert("Failed to analyze video.");
+      });
+  }
+
+  // ✅ Show upload section and handle file selection
   addEventListenerIfExists("upload", "click", () => {
     document.getElementById("drag-drop-container").style.display = "block";
     document.getElementById("file-input").focus(); // Focus input for pasting
