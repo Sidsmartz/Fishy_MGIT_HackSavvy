@@ -1,123 +1,209 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>Phishing Detector</title>
-  <style>
-    body { 
-      width: 320px; 
-      text-align: center; 
-      font-family: Arial, sans-serif; 
-      position: relative; 
-      border-radius: 10px;
-      overflow: hidden;
-    }
-    button { 
-      margin: 5px; 
-      padding: 8px 15px; 
-      cursor: pointer; 
-      border: none; 
-    }
-    input, textarea { 
-      width: 90%; 
-      padding: 5px; 
-      margin: 5px; 
-    }
-    .section { 
-      display: none; 
-    }
-    
-    /* Header */
-    .header { 
-      width: 100%; 
-      height: 60px; 
-      background: url('assets/headerfinal.png') no-repeat center; 
-      border-radius: 10px 10px 0 0; 
-    }
+  <head>
+    <title>Phishing Detector</title>
+    <style>
+      @font-face {
+        font-family: "BillyBold";
+        src: url("assets/Billy-Bold.ttf") format("truetype");
+      }
+      body {
+        background: transparent;
+        background-image: url("assets/plainbg.png");
+        width: 350px;
+        text-align: center;
+        font-family: "BillyBold", Arial, sans-serif;
+        position: relative;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+      button {
+        margin: 5px;
+        padding: 8px 15px;
+        cursor: pointer;
+        border: none;
+      }
+      input,
+      textarea {
+        width: 90%;
+        padding: 5px;
+        font-family: "BillyBold", Arial, sans-serif; /* Set font to BillyBold */
+      }
+      /* Placeholder Font Style */
+      input::placeholder,
+      textarea::placeholder {
+        font-family: "BillyBold", Arial, sans-serif; /* Set placeholder font to BillyBold */
+      }
+      .section {
+        display: none;
+      }
 
-    /* Centered Text */
-    .pixelart { 
-      margin: 10px auto; 
-      width: 80%; 
-      height: 150px; 
-      background: url('assets/PIXELART.png') no-repeat center; 
-      background-size: contain; 
-    }
+      /* Header */
+      .header {
+        width: 100%;
+        height: 120px;
+        background: url("assets/headerfinal.png") no-repeat center;
+        border-radius: 10px 10px 0 0;
+      }
 
-    /* Buttons */
-    .scan, .upload, .redeem, .find, .report { 
-      background: none; 
-      width: 80px; 
-      height: 40px; 
-      border: none; 
-      cursor: pointer; 
-    }
-    .scan { background: url('assets/scan.png') no-repeat center; background-size: contain; }
-    .upload { background: url('assets/upload.png') no-repeat center; background-size: contain; }
-    .redeem { background: url('assets/redeembutton.png') no-repeat center; background-size: contain; }
-    .find { background: url('assets/findbutton.png') no-repeat center; background-size: contain; }
-    .report { background: url('assets/reportbutton.png') no-repeat center; background-size: contain; }
+      /* Centered Text */
+      .pixelart {
+        margin: 10px auto;
+        width: 80%;
+        height: 150px;
+        background: url("assets/PIXELART.png") no-repeat center;
+        background-size: contain;
+      }
 
-    /* Drag and Drop */
-    #drag-drop-container { 
-      display: none; 
-      margin-top: 10px; 
-      cursor: pointer; 
-    }
-    #drag-drop-image { 
-      width: 100px; 
-      height: 100px; 
-      background: url('assets/draganddropfiles.png') no-repeat center; 
-      background-size: contain; 
-    }
-    
-    /* Popup Rounded Corners */
-    .popup-content {
-      border-radius: 10px;
-    }
+      /* Buttons */
+      .scan,
+      .upload,
+      .redeem,
+      .find,
+      .report {
+        background: none;
+        width: 80px;
+        height: 40px;
+        border: none;
+        cursor: pointer;
+      }
+      .scan {
+        background: url("assets/scan.png") no-repeat center;
+        background-size: contain;
+      }
+      .upload {
+        background: url("assets/upload.png") no-repeat center;
+        background-size: contain;
+      }
+      .redeem {
+        background: url("assets/redeembutton.png") no-repeat center;
+        background-size: contain;
+      }
+      .find {
+        background: url("assets/findbutton.png") no-repeat center;
+        background-size: contain;
+      }
+      .report {
+        background: url("assets/reportbutton.png") no-repeat center;
+        background-size: contain;
+      }
 
-  </style>
-</head>
-<body>
-  <div class="header"></div>
-  
-  <div class="pixelart"></div>
+      /* Drag and Drop */
+      #drag-drop-container {
+        display: flex;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+      }
+      #drag-drop-image {
+        width: 100px;
+        height: 100px;
+        background: url("assets/draganddropfiles.png") no-repeat center;
+        background-size: contain;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-  <button id="scan" class="scan"></button>
-  <button id="upload" class="upload"></button>
-  <button id="find-tab" class="find"></button>
-  <button id="report-tab" class="report"></button>
-  <button id="redeem-tab" class="redeem"></button>
+      /* Popup Rounded Corners */
+      .popup-content {
+        border-radius: 10px;
+      }
+      button#report-btn,
+      button#redeem-btn {
+        border-radius: 20px; /* Rounded corners */
+        border: 2px solid #333; /* Dark border */
+        background-color: #fff; /* White background */
+        font-family: "BillyBold", Arial, sans-serif;
+        padding: 10px 20px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <svg
+      id="loading-spinner"
+      class="container"
+      viewBox="0 0 40 40"
+      height="40"
+      width="40"
+      style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      "
+    >
+      <circle
+        class="track"
+        cx="20"
+        cy="20"
+        r="17.5"
+        pathlength="100"
+        stroke-width="5px"
+        fill="none"
+      />
+      <circle
+        class="car"
+        cx="20"
+        cy="20"
+        r="17.5"
+        pathlength="100"
+        stroke-width="5px"
+        fill="none"
+      />
+    </svg>
+    <div class="header"></div>
 
-  <div id="drag-drop-container">
-    <div id="drag-drop-image"></div>
-    <input type="file" id="file-input" accept="image/*,video/*" style="display: none;">
-  </div>
+    <div class="pixelart"></div>
 
-  <div id="find-section" class="section">
-    <h2>Find Phishers</h2>
-    <input id="find-input" placeholder="Enter name, email, or phone">
-    <button id="find-btn">Search</button>
-    <div id="find-results"></div>
-  </div>
+    <button id="scan" class="scan"></button>
+    <button id="upload" class="upload"></button>
+    <button id="find-tab" class="find"></button>
+    <button id="report-tab" class="report"></button>
+    <button id="redeem-tab" class="redeem"></button>
 
-  <div id="report-section" class="section">
-    <h2>Report Phisher</h2>
-    <input id="name" placeholder="Source Name">
-    <input id="phone" placeholder="Phone (optional)">
-    <input id="phisher-email" placeholder="Phisher's Email">
-    <input id="reporter-email" placeholder="Your Email">
-    <input id="attack" placeholder="Type of Attack">
-    <button id="report-btn">Submit</button>
-    <p id="report-status"></p>
-  </div>
+    <div id="drag-drop-container">
+      <div id="drag-drop-image"></div>
+      <input
+        type="file"
+        id="file-input"
+        accept="image/*,video/*"
+        style="opacity: 0; position: absolute; width: 0; height: 0"
+        tabindex="0"
+        aria-label="Upload or paste media for analysis"
+      />
+      <div id="drag-drop-container" style="display: none">
+        <p>Click here to upload or paste an image/video</p>
+      </div>
+    </div>
 
-  <div id="redeem-section" class="section">
-    <h2>Redeem Rewards</h2>
-    <input id="redeem-email" placeholder="Enter your email">
-    <button id="redeem-btn">Check</button>
-    <p id="reward-points"></p>
-  </div>
+    <div id="find-section" class="section">
+      <h2>Find Phishers</h2>
+      <input id="find-input" placeholder="Enter name, email, or phone" />
+      <button id="find-btn">Search</button>
+      <div id="find-results"></div>
+    </div>
 
-  <script src="popup.js"></script>
-</body>
+    <div id="report-section" class="section">
+      <h2>Report Phisher</h2>
+      <input id="name" placeholder="Source Name" />
+      <input id="phone" placeholder="Phone (optional)" />
+      <input id="phisher-email" placeholder="Phisher's Email" />
+      <input id="reporter-email" placeholder="Your Email" />
+      <input id="attack" placeholder="Type of Attack" />
+      <button id="report-btn">Submit</button>
+      <p id="report-status"></p>
+    </div>
+
+    <div id="redeem-section" class="section">
+      <h2>Redeem Rewards</h2>
+      <input id="redeem-email" placeholder="Enter your email" />
+      <button id="redeem-btn">Check</button>
+      <p id="reward-points"></p>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
 </html>
