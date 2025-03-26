@@ -1,6 +1,7 @@
 body {
     width: 220px;
     text-align: center;
+    border-radius: 8px;
   }
   
   button {
@@ -25,5 +26,6 @@ body {
     border-radius: 5px;
     z-index: 9999;
     font-size: 14px;
+    border-radius: 8px;
   }
   

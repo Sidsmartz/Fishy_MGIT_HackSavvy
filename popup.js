@@ -19,36 +19,61 @@ document.addEventListener("DOMContentLoaded", () => {
     chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
   });
 
-  // ✅ Show upload section
-  addEventListenerIfExists("upload", "click", () => {
-    document.getElementById("drag-drop-container").style.display = "block";
-  });
-
-  // ✅ Handle file selection for deepfake detection
-  addEventListenerIfExists("drag-drop-container", "click", () => {
-    document.getElementById("file-input").click();
-  });
-
-  addEventListenerIfExists("file-input", "change", async (event) => {
-    const file = event.target.files[0];
+  // ✅ Handle file upload for deepfake detection
+  function handleFileUpload(file) {
     if (!file) return;
 
     const formData = new FormData();
     formData.append("file", file);
 
-    try {
-      const res = await fetch(`${API_URL}/upload-video`, {
-        method: "POST",
-        body: formData
+    fetch(`${API_URL}/upload-video`, {
+      method: "POST",
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        alert(`Result: ${data.deepfake_detected ? "Fake" : "Not Fake"} | Confidence: ${data.confidence}%`);
+      })
+      .catch(error => {
+        console.error("Error uploading video:", error);
+        alert("Failed to analyze video.");
       });
+  }
 
-      const data = await res.json();
-      alert(`Result: ${data.deepfake_detected ? "Fake" : "Not Fake"} | Confidence: ${data.confidence}%`);
-    } catch (error) {
-      console.error("Error uploading video:", error);
-      alert("Failed to analyze video.");
-    }
+  // ✅ Show upload section and handle file selection
+  addEventListenerIfExists("upload", "click", () => {
+    document.getElementById("drag-drop-container").style.display = "block";
+    document.getElementById("file-input").click();
   });
+
+  addEventListenerIfExists("drag-drop-container", "click", () => {
+    document.getElementById("file-input").click();
+  });
+
+  addEventListenerIfExists("file-input", "change", (event) => {
+    const file = event.target.files[0];
+    handleFileUpload(file);
+  });
+
+  // ✅ Handle drag-and-drop functionality
+  const dragDropContainer = document.getElementById("drag-drop-container");
+  if (dragDropContainer) {
+    dragDropContainer.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      dragDropContainer.classList.add("drag-over");
+    });
+
+    dragDropContainer.addEventListener("dragleave", () => {
+      dragDropContainer.classList.remove("drag-over");
+    });
+
+    dragDropContainer.addEventListener("drop", (event) => {
+      event.preventDefault();
+      dragDropContainer.classList.remove("drag-over");
+      const file = event.dataTransfer.files[0];
+      handleFileUpload(file);
+    });
+  }
 
   // ✅ Handle tab switching
   addEventListenerIfExists("find-tab", "click", () => showSection("find-section"));

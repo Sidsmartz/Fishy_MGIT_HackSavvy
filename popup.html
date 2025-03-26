@@ -3,10 +3,17 @@
 <head>
   <title>Phishing Detector</title>
   <style>
+    @font-face {
+      font-family: 'BillyBold';
+      src: url('assets/Billy-Bold.ttf') format('truetype');
+    }
+
     body { 
-      width: 320px; 
+      background: transparent;
+      background-image: url('assets/plainbg.png');
+      width: 350px; 
       text-align: center; 
-      font-family: Arial, sans-serif; 
+      font-family: 'BillyBold', Arial, sans-serif; 
       position: relative; 
       border-radius: 10px;
       overflow: hidden;
@@ -20,8 +27,13 @@
     input, textarea { 
       width: 90%; 
       padding: 5px; 
-      margin: 5px; 
+      font-family: 'BillyBold', Arial, sans-serif; /* Set font to BillyBold */
     }
+    /* Placeholder Font Style */
+    input::placeholder, textarea::placeholder {
+      font-family: 'BillyBold', Arial, sans-serif; /* Set placeholder font to BillyBold */
+    }
+
     .section { 
       display: none; 
     }
@@ -29,7 +41,7 @@
     /* Header */
     .header { 
       width: 100%; 
-      height: 60px; 
+      height: 120px; 
       background: url('assets/headerfinal.png') no-repeat center; 
       border-radius: 10px 10px 0 0; 
     }
@@ -59,15 +71,19 @@
 
     /* Drag and Drop */
     #drag-drop-container { 
-      display: none; 
-      margin-top: 10px; 
+      display: flex; 
       cursor: pointer; 
+      align-items: center;
+      justify-content: center;
     }
     #drag-drop-image { 
       width: 100px; 
       height: 100px; 
       background: url('assets/draganddropfiles.png') no-repeat center; 
       background-size: contain; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     
     /* Popup Rounded Corners */
@@ -75,6 +91,15 @@
       border-radius: 10px;
     }
 
+    /* Rounded submit button with dark border */
+    button#report-btn, button#redeem-btn {
+      border-radius: 20px; /* Rounded corners */
+      border: 2px solid #333; /* Dark border */
+      background-color: #fff; /* White background */
+      font-family: 'BillyBold', Arial, sans-serif;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
