@@ -1,14 +1,19 @@
 let highlightedElements = [];
 
 function scanPage() {
-  document.querySelectorAll("div").forEach((div) => {
-    if (!div.innerText.trim()) return;
-    div.style.outline = "2px solid red";
-    highlightedElements.push(div);
-    div.addEventListener("click", () => analyzeContent(div));
+  // Add click listener to the document to detect div clicks
+  document.addEventListener("click", (event) => {
+    const div = event.target.closest("div");
+    if (div && !highlightedElements.includes(div)) {
+      // Apply light blue border with glow and low opacity
+      div.style.outline = "2px solid rgba(173, 216, 230, 0.5)"; // Light blue with 50% opacity
+      div.style.boxShadow = "0 0 8px rgba(173, 216, 230, 0.7)"; // Glow effect
+      highlightedElements.push(div);
+      analyzeContent(div); // Analyze only the clicked div
+    }
   });
 
-  alert("Select anything on the page to check its validity.");
+  alert("Click on any div on the page to check its validity.");
 }
 
 async function analyzeContent(element) {
@@ -22,23 +27,23 @@ async function analyzeContent(element) {
   });
 
   const data = await response.json();
-  const phishingScore = data.phishing_detected;
-  console.log(data); // This is already a number (percentage)
+  const isPhishing = data.phishing_detected;
+  const probability = data.probability;
 
   const popup = document.createElement("div");
   popup.style.position = "absolute";
-  popup.style.background =
-    phishingScore >= 50 ? "rgba(255, 0, 0, 0.8)" : "rgba(0, 255, 0, 0.8)";
+  popup.style.background = isPhishing
+    ? "rgba(255, 0, 0, 0.8)"
+    : "rgba(0, 255, 0, 0.8)";
   popup.style.color = "#fff";
   popup.style.padding = "5px 10px";
   popup.style.borderRadius = "5px";
   popup.style.fontSize = "14px";
   popup.style.zIndex = "9999";
 
-  popup.innerText =
-    phishingScore >= 50
-      ? `⚠️ Phishing detected (Probability: ${phishingScore}%)`
-      : `✅ Safe (Probability: ${phishingScore}%)`;
+  popup.innerText = isPhishing
+    ? `⚠️ Phishing detected (Probability: ${probability}%)`
+    : `✅ Safe (Probability: ${probability}%)`;
 
   document.body.appendChild(popup);
 
