@@ -1,0 +1,29 @@
+body {
+    width: 220px;
+    text-align: center;
+  }
+  
+  button {
+    margin: 10px;
+    padding: 8px 15px;
+    cursor: pointer;
+  }
+  
+  #result {
+    margin-top: 10px;
+    padding: 5px;
+    font-size: 14px;
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+  }
+  
+  .overlay-box {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px;
+    border-radius: 5px;
+    z-index: 9999;
+    font-size: 14px;
+  }
+  

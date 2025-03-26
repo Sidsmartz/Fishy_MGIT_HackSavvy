@@ -1,10 +1,50 @@
-
 <!DOCTYPE html>
 <html>
-  <head><title>AI Detector</title></head>
-  <body>
-    <h1>Click to scan</h1>
-    <button id="scan">Scan</button>
-    <script src="popup.js"></script>
-  </body>
+<head>
+  <title>AI Detector</title>
+  <style>
+    body { width: 300px; text-align: center; font-family: Arial, sans-serif; }
+    button { margin: 5px; padding: 8px 15px; }
+    input, select, textarea { width: 90%; padding: 5px; margin: 5px; }
+    .section { display: none; }
+  </style>
+</head>
+<body>
+  <h1>AI Detector</h1>
+  <button id="scan">Scan Page</button>
+  <button id="find-tab">Find Phishers</button>
+  <button id="report-tab">Report Phisher</button>
+  <button id="redeem-tab">Redeem Rewards</button>
+
+  <div id="scan-result" class="section">
+    <h2>Scan Result</h2>
+    <p id="report-text"></p>
+  </div>
+
+  <div id="find-section" class="section">
+    <h2>Find Phishers</h2>
+    <input id="find-input" placeholder="Enter name, email, or phone">
+    <button id="find-btn">Search</button>
+    <div id="find-results"></div>
+  </div>
+
+  <div id="report-section" class="section">
+    <h2>Report Phisher</h2>
+    <input id="name" placeholder="Source Name">
+    <input id="phone" placeholder="Phone (optional)">
+    <input id="email" placeholder="Email">
+    <input id="attack" placeholder="Type of Attack">
+    <button id="report-btn">Submit</button>
+    <p id="report-status"></p>
+  </div>
+
+  <div id="redeem-section" class="section">
+    <h2>Redeem Rewards</h2>
+    <input id="redeem-email" placeholder="Enter your email">
+    <button id="redeem-btn">Check</button>
+    <p id="reward-points"></p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
 </html>
