@@ -1,6 +1,7 @@
 function highlightDivs() {
-  const divs = document.querySelectorAll("div");
-  divs.forEach(div => {
+  document.querySelectorAll("div").forEach(div => {
+    if (div.children.length > 0) return; // Only outline topmost elements
+
     div.style.outline = "2px solid red";
 
     div.addEventListener("click", async function handler(e) {
@@ -11,66 +12,48 @@ function highlightDivs() {
       const img = div.querySelector("img");
       const video = div.querySelector("video");
 
-      let result = "";
-      let confidence = "";
-
+      let requestData;
       if (img) {
-        ({ result, confidence } = await processImage(img));
+        requestData = { image: img.src };
       } else if (video) {
-        ({ result, confidence } = await processVideo(video));
+        requestData = { video: video.src };
       } else if (content) {
-        ({ result, confidence } = await processText(content));
+        requestData = { text: content };
+      } else {
+        return;
       }
 
-      if (result) showOverlay(div, result, confidence);
+      fetch("http://localhost:3000/check-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData)
+      })
+      .then(res => res.json())
+      .then(data => showOverlay(div, data));
+
+      div.removeEventListener("click", handler);
     }, { once: true });
   });
 }
 
-async function processText(text) {
-  const res = await fetch("http://localhost:3000/check-phishing", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text })
-  });
-  const data = await res.json();
-  return { result: data.is_phishing ? "Phishing detected!" : "Safe", confidence: data.confidence || 80 };
-}
-
-async function processImage(img) {
-  const blob = await fetch(img.src).then(res => res.blob());
-  const formData = new FormData();
-  formData.append("image", blob, "image.jpg");
-
-  const res = await fetch("http://localhost:3000/check-image", { method: "POST", body: formData });
-  const data = await res.json();
-  return { result: data.deepfake_detected ? "Deepfake detected!" : "Safe", confidence: data.confidence || 90 };
-}
-
-async function processVideo(video) {
-  const blob = await fetch(video.src).then(res => res.blob());
-  const formData = new FormData();
-  formData.append("video", blob, "video.mp4");
-
-  const res = await fetch("http://localhost:3000/upload-video", { method: "POST", body: formData });
-  const data = await res.json();
-  return { result: data.deepfake_detected ? "Deepfake detected!" : "Safe", confidence: data.confidence || 85 };
-}
-
-function showOverlay(div, result, confidence) {
+function showOverlay(element, data) {
   const overlay = document.createElement("div");
+  overlay.innerText = `Deepfake: ${data.result} | Confidence: ${data.confidence || "N/A"}`;
   overlay.style.position = "absolute";
-  overlay.style.background = "rgba(255,0,0,0.7)";
-  overlay.style.color = "white";
+  overlay.style.background = "rgba(255,0,0,0.8)";
+  overlay.style.color = "#fff";
   overlay.style.padding = "5px";
-  overlay.innerText = `${result} (Confidence: ${confidence}%)`;
+  overlay.style.borderRadius = "5px";
+  overlay.style.zIndex = "1000";
+  overlay.style.left = `${element.getBoundingClientRect().left}px`;
+  overlay.style.top = `${element.getBoundingClientRect().top}px`;
+  overlay.style.transform = "translateY(-100%)"; // Adjust to stay near the image
   document.body.appendChild(overlay);
 
-  const rect = div.getBoundingClientRect();
-  overlay.style.top = `${rect.top + window.scrollY}px`;
-  overlay.style.left = `${rect.left + window.scrollX}px`;
-
-  setTimeout(() => overlay.remove(), 5000);
+  setTimeout(() => {
+    overlay.remove();
+    element.style.outline = "none";
+  }, 5000);
 }
 
 highlightDivs();

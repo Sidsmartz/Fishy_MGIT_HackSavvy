@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "AI Phishing Detector",
+  "name": "Fishy - One for All",
   "version": "1.0",
   "permissions": ["storage", "activeTab", "scripting", "tabs"],
   "host_permissions": ["http://localhost:3000/*"],
@@ -10,9 +10,9 @@
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon.png",
-      "48": "icon.png",
-      "128": "icon.png"
+      "16": "roundlogo.png",
+      "48": "roundlogo.png",
+      "128": "roundlogo.png"
     }
   },
   "content_scripts": [

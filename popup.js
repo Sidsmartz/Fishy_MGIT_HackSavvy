@@ -3,49 +3,33 @@ document.getElementById("scan").addEventListener("click", async () => {
   chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["content.js"] });
 });
 
-document.getElementById("find-tab").addEventListener("click", () => showSection("find-section"));
-document.getElementById("report-tab").addEventListener("click", () => showSection("report-section"));
-document.getElementById("redeem-tab").addEventListener("click", () => showSection("redeem-section"));
-
-document.getElementById("find-btn").addEventListener("click", async () => {
-  const query = document.getElementById("find-input").value;
-  const res = await fetch(`http://localhost:3000/find-phishers?query=${query}`);
-  const data = await res.json();
-  document.getElementById("find-results").innerText = JSON.stringify(data, null, 2);
+document.getElementById("upload").addEventListener("click", () => {
+  document.getElementById("drag-drop-container").style.display = "block";
 });
 
-document.getElementById("report-btn").addEventListener("click", async () => {
-  const reportData = {
-    name: document.getElementById("name").value,
-    phone: document.getElementById("phone").value,
-    phisher_email: document.getElementById("phisher-email").value,
-    reporter_email: document.getElementById("reporter-email").value,
-    attackType: document.getElementById("attack").value
-  };
+document.getElementById("drag-drop-container").addEventListener("click", () => {
+  document.getElementById("file-input").click();
+});
 
-  const res = await fetch("http://localhost:3000/report-phisher", {
+document.getElementById("file-input").addEventListener("change", async (event) => {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("http://localhost:3000/upload-video", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(reportData)
+    body: formData
   });
 
   const data = await res.json();
-  document.getElementById("report-status").innerText = data.message;
+  alert(`Result: ${data.deepfake_detected ? "Fake" : "Not Fake"} | Confidence: ${data.confidence}`);
 });
 
-document.getElementById("redeem-btn").addEventListener("click", async () => {
-  const email = document.getElementById("redeem-email").value;
-  const res = await fetch(`http://localhost:3000/redeem-rewards?email=${email}`);
-  const data = await res.json();
-  document.getElementById("reward-points").innerText = `Your Points: ${data.points}`;
-});
-
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.report) {
-    showSection("scan-result");
-    document.getElementById("report-text").innerText = message.report;
-  }
-});
+document.getElementById("find-tab").addEventListener("click", () => showSection("find-section"));
+document.getElementById("report-tab").addEventListener("click", () => showSection("report-section"));
+document.getElementById("redeem-tab").addEventListener("click", () => showSection("redeem-section"));
 
 function showSection(id) {
   document.querySelectorAll(".section").forEach(section => section.style.display = "none");
