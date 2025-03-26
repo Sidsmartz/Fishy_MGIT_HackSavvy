@@ -18,10 +18,11 @@ document.getElementById("report-btn").addEventListener("click", async () => {
   const reportData = {
     name: document.getElementById("name").value,
     phone: document.getElementById("phone").value,
-    email: document.getElementById("email").value,
+    phisher_email: document.getElementById("phisher-email").value,
+    reporter_email: document.getElementById("reporter-email").value,
     attackType: document.getElementById("attack").value
   };
-  
+
   const res = await fetch("http://localhost:3000/report-phisher", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

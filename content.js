@@ -11,8 +11,8 @@ function highlightDivs() {
       const img = div.querySelector("img");
       const video = div.querySelector("video");
 
-      let result = "Processing...";
-      let confidence = "N/A";
+      let result = "";
+      let confidence = "";
 
       if (img) {
         ({ result, confidence } = await processImage(img));
@@ -22,8 +22,7 @@ function highlightDivs() {
         ({ result, confidence } = await processText(content));
       }
 
-      showOverlay(div, result, confidence);
-      chrome.runtime.sendMessage({ report: `${result} (Confidence: ${confidence}%)` });
+      if (result) showOverlay(div, result, confidence);
     }, { once: true });
   });
 }

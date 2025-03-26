@@ -29,14 +29,20 @@ def report_phisher():
     data = request.json
     reports.insert_one(data)
     
-    users.update_one({"email": data["email"]}, {"$inc": {"points": 5}}, upsert=True)
+    users.update_one({"email": data["reporter_email"]}, {"$inc": {"points": 5}}, upsert=True)
     return jsonify({"message": "Report submitted. 5 points added!"})
 
 @app.route("/find-phishers", methods=["GET"])
 def find_phishers():
     query = request.args.get("query")
-    results = list(reports.find({"$or": [{"email": query}, {"phone": query}, {"name": query}]}))
+    results = list(reports.find({"$or": [{"phisher_email": query}, {"phone": query}, {"name": query}]}))
+
+    # Convert ObjectId to string
+    for report in results:
+        report["_id"] = str(report["_id"])
+
     return jsonify(results)
+
 
 @app.route("/redeem-rewards", methods=["GET"])
 def redeem_rewards():
