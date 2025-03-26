@@ -1,59 +1,52 @@
-function highlightDivs() {
-  document.querySelectorAll("div").forEach(div => {
-    if (div.children.length > 0) return; // Only outline topmost elements
+let highlightedElements = [];
 
-    div.style.outline = "2px solid red";
+function scanPage() {
+    document.querySelectorAll("div").forEach(div => {
+        if (!div.innerText.trim()) return;
+        div.style.outline = "2px solid red";
+        highlightedElements.push(div);
+        div.addEventListener("click", () => analyzeContent(div));
+    });
 
-    div.addEventListener("click", async function handler(e) {
-      e.stopPropagation();
-      e.preventDefault();
+    alert("Select anything on the page to check its validity.");
+}
 
-      const content = div.innerText.trim();
-      const img = div.querySelector("img");
-      const video = div.querySelector("video");
+async function analyzeContent(element) {
+    const text = element.innerText.trim();
+    if (!text) return;
 
-      let requestData;
-      if (img) {
-        requestData = { image: img.src };
-      } else if (video) {
-        requestData = { video: video.src };
-      } else if (content) {
-        requestData = { text: content };
-      } else {
-        return;
-      }
-
-      fetch("http://localhost:3000/check-content", {
+    const response = await fetch("http://localhost:3000/check-phishing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData)
-      })
-      .then(res => res.json())
-      .then(data => showOverlay(div, data));
+        body: JSON.stringify({ text })
+    });
 
-      div.removeEventListener("click", handler);
-    }, { once: true });
-  });
+    const data = await response.json();
+    const { phishing_detected, confidence } = data;
+
+    const popup = document.createElement("div");
+    popup.style.position = "absolute";
+    popup.style.background = phishing_detected ? "rgba(255, 0, 0, 0.8)" : "rgba(0, 255, 0, 0.8)";
+    popup.style.color = "#fff";
+    popup.style.padding = "5px 10px";
+    popup.style.borderRadius = "5px";
+    popup.style.fontSize = "14px";
+    popup.style.zIndex = "9999";
+
+    popup.innerText = phishing_detected
+        ? `⚠️ Phishing detected (Confidence: ${confidence}%)`
+        : `✅ Safe (Confidence: ${confidence}%)`;
+
+    document.body.appendChild(popup);
+    
+    const rect = element.getBoundingClientRect();
+    popup.style.top = `${window.scrollY + rect.top - 30}px`;
+    popup.style.left = `${window.scrollX + rect.left}px`;
+
+    setTimeout(() => popup.remove(), 4000);
 }
 
-function showOverlay(element, data) {
-  const overlay = document.createElement("div");
-  overlay.innerText = `Deepfake: ${data.result} | Confidence: ${data.confidence || "N/A"}`;
-  overlay.style.position = "absolute";
-  overlay.style.background = "rgba(255,0,0,0.8)";
-  overlay.style.color = "#fff";
-  overlay.style.padding = "5px";
-  overlay.style.borderRadius = "5px";
-  overlay.style.zIndex = "1000";
-  overlay.style.left = `${element.getBoundingClientRect().left}px`;
-  overlay.style.top = `${element.getBoundingClientRect().top}px`;
-  overlay.style.transform = "translateY(-100%)"; // Adjust to stay near the image
-  document.body.appendChild(overlay);
-
-  setTimeout(() => {
-    overlay.remove();
-    element.style.outline = "none";
-  }, 5000);
+if (!window.hasRun) {
+    scanPage();
+    window.hasRun = true;
 }
-
-highlightDivs();
